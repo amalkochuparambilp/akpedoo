@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edoo | Advanced Learning Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #3b82f6;
+            --brand-dark: #020617;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--brand-dark);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .text-balance { text-wrap: balance; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .track-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        .track-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .marquee-container {
+            display: flex;
+            overflow: hidden;
+            user-select: none;
+            gap: 20px;
+        }
+        .marquee-content {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-around;
+            min-width: 100%;
+            gap: 20px;
+        }
+        
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--brand-primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s;
+        }
+
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .mobile-menu.active { transform: translateX(0); }
+        
+        .reveal { opacity: 0; transform: translateY(30px); }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body>
+
+    <div class="custom-cursor hidden md:block" id="cursor"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-[100] px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center glass-panel rounded-2xl px-6 py-3">
+            <div class="flex items-center gap-2 group cursor-pointer">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold rotate-0 group-hover:rotate-12 transition-transform text-white">E</div>
+                <span class="text-xl font-bold tracking-tight">edoo</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#home" class="hover:text-white transition-colors">Home</a>
+                <a href="#courses" class="hover:text-white transition-colors">University Tracks</a>
+                <a href="#ecosystem" class="hover:text-white transition-colors">Ecosystem</a>
+                <a href="#about" class="hover:text-white transition-colors">About</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="hidden sm:block text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white/5 transition-colors">Login</button>
+                <button class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-900/20">
+                    Get Started
+                </button>
+                <button id="menuBtn" class="md:hidden flex flex-col gap-1.5 p-2">
+                    <div class="w-6 h-0.5 bg-white"></div>
+                    <div class="w-6 h-0.5 bg-white"></div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-0 z-[110] bg-slate-950 p-10 flex flex-col justify-center gap-8 md:hidden">
+        <button id="closeMenu" class="absolute top-8 right-8 text-4xl">&times;</button>
+        <a href="#home" class="text-4xl font-bold">Home</a>
+        <a href="#courses" class="text-4xl font-bold text-slate-500">University Tracks</a>
+        <a href="#ecosystem" class="text-4xl font-bold text-slate-500">Ecosystem</a>
+        <a href="#about" class="text-4xl font-bold text-slate-500">About</a>
+        <div class="mt-auto pt-10 border-t border-white/10">
+            <p class="text-slate-500">Founded by Amal K P</p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center pt-32 overflow-hidden px-6">
+        <div class="absolute top-1/4 -left-20 w-96 h-96 bg-blue-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-indigo-600/10 blur-[120px] rounded-full"></div>
+
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div id="heroBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-blue-400 mb-8 opacity-0">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                SYLLABUS 2026 NOW LIVE
+            </div>
+            <h1 id="heroTitle" class="text-5xl md:text-8xl font-extrabold tracking-tight mb-8 leading-[1.1] opacity-0">
+                Elevating <span class="text-blue-500">Kerala's</span> <br>Tech Education.
+            </h1>
+            <p id="heroDesc" class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 text-balance opacity-0">
+                Premium notes and structured resources for KTU, KU, and MG University ecosystems. Join 1,000+ students building the future.
+            </p>
+            <div id="heroActions" class="flex flex-col sm:flex-row justify-center gap-4 opacity-0">
+                <button class="bg-white text-slate-950 px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform">Explore Notes</button>
+                <button class="glass-panel px-8 py-4 rounded-2xl font-bold hover:bg-white/10 transition-colors">Join Community</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- University Tracks Section -->
+    <section id="courses" class="py-24 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16 reveal">
+                <div class="max-w-2xl">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4 italic tracking-tighter">UNIVERSITY TRACKS</h2>
+                    <p class="text-slate-500">Expertly curated modules designed for the Kerala university ecosystem.</p>
+                </div>
+                <div class="flex gap-2">
+                    <div class="px-4 py-2 glass-panel rounded-lg text-xs font-bold text-blue-400 border-blue-500/20">SYLLABUS 2026</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="trackGrid">
+                
+                <!-- KTU Track -->
+                <div class="track-card p-10 rounded-[2.5rem] reveal group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-20 h-20 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="w-12 h-12 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-400">
+                            <span class="font-bold">KTU</span>
+                        </div>
+                        <span class="status-badge bg-blue-500/10 text-blue-400 border border-blue-500/20">Active</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">APJ Abdul Kalam</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">Comprehensive B.Tech modules covering CS, AI, and EC streams for 2026 regulations.</p>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-slate-300 font-bold">S1-S8</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-slate-300 font-bold">ENGR PHYSICS</span>
+                    </div>
+                    <button class="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-blue-400 transition-colors">Explore Modules</button>
+                </div>
+
+                <!-- KU Track -->
+                <div class="track-card p-10 rounded-[2.5rem] reveal group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-20 h-20 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="w-12 h-12 bg-purple-600/20 rounded-2xl flex items-center justify-center text-purple-400">
+                            <span class="font-bold">KU</span>
+                        </div>
+                        <span class="status-badge bg-purple-500/10 text-purple-400 border border-purple-500/20">New</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Kerala University</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">Dedicated paths for BSc Cyberforensic and BCA following the new FYUGP framework.</p>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-slate-300 font-bold">FYUGP</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-slate-300 font-bold">CYBER SEC</span>
+                    </div>
+                    <button class="w-full py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-colors">View Path</button>
+                </div>
+
+                <!-- MG Track -->
+                <div class="track-card p-10 rounded-[2.5rem] reveal group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-20 h-20 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="w-12 h-12 bg-orange-600/20 rounded-2xl flex items-center justify-center text-orange-400">
+                            <span class="font-bold">MG</span>
+                        </div>
+                        <span class="status-badge bg-orange-500/10 text-orange-400 border border-orange-500/20">Updated</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">MG University</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">Specialized Data Science and Management modules tailored for MG ecosystem standards.</p>
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-slate-300 font-bold">DATA SCIENCE</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-slate-300 font-bold">MCA</span>
+                    </div>
+                    <button class="w-full py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-colors">Browse Tracks</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Ecosystem Section -->
+    <section id="ecosystem" class="py-24 bg-slate-900/30">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl font-bold mb-4 italic tracking-tighter">THE EDOO ECOSYSTEM</h2>
+                <p class="text-slate-500 uppercase text-xs font-black tracking-[0.3em]">From Foundation to Mastery</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Edoo+ -->
+                <div class="ecosystem-card relative group cursor-pointer overflow-hidden rounded-[3rem] reveal">
+                    <div class="absolute inset-0 bg-gradient-to-b from-indigo-600 to-indigo-900 group-hover:scale-110 transition-transform duration-700"></div>
+                    <div class="relative p-12 h-full flex flex-col justify-between z-10">
+                        <div>
+                            <h3 class="text-6xl font-black mb-4">edoo<span class="text-indigo-200">+</span></h3>
+                            <p class="text-indigo-100/70 text-lg max-w-xs mb-10">Premium coaching for Plus One & Plus Two students.</p>
+                        </div>
+                        <ul class="space-y-3 mb-10 text-white">
+                            <li class="flex items-center gap-3 font-semibold"><div class="w-2 h-2 bg-white rounded-full"></div> Science Track</li>
+                            <li class="flex items-center gap-3 font-semibold"><div class="w-2 h-2 bg-white rounded-full"></div> Commerce Track</li>
+                        </ul>
+                        <button class="w-fit bg-white text-indigo-900 px-8 py-3 rounded-2xl font-bold">Discover Plus</button>
+                    </div>
+                </div>
+
+                <!-- Edoo S2LC -->
+                <div class="ecosystem-card relative group cursor-pointer overflow-hidden rounded-[3rem] reveal">
+                    <div class="absolute inset-0 bg-gradient-to-b from-orange-500 to-orange-700 group-hover:scale-110 transition-transform duration-700"></div>
+                    <div class="relative p-12 h-full flex flex-col justify-between z-10">
+                        <div>
+                            <h3 class="text-6xl font-black mb-4">edoo <span class="opacity-50 text-white">S²LC</span></h3>
+                            <p class="text-orange-50/70 text-lg max-w-xs mb-10 text-white">The ultimate success path for Kerala 10th standard.</p>
+                        </div>
+                        <ul class="space-y-3 mb-10 text-white">
+                            <li class="flex items-center gap-3 font-semibold"><div class="w-2 h-2 bg-white rounded-full"></div> State Syllabus Focus</li>
+                            <li class="flex items-center gap-3 font-semibold"><div class="w-2 h-2 bg-white rounded-full"></div> 10/10 A+ Strategies</li>
+                        </ul>
+                        <button class="w-fit bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold">Start Learning</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee Testimonials -->
+    <section class="py-24 overflow-hidden">
+        <div class="marquee-container">
+            <div class="marquee-content py-4">
+                <div class="w-[350px] glass-panel p-8 rounded-3xl shrink-0">
+                    <p class="text-slate-300 mb-6 italic">"BCA notes from Edoo made my semester exams incredibly smooth. Simplified logic."</p>
+                    <p class="text-sm font-bold">Abhijith P. • BCA</p>
+                </div>
+                <div class="w-[350px] glass-panel p-8 rounded-3xl shrink-0">
+                    <p class="text-slate-300 mb-6 italic">"The S2LC revision series is the reason I got full A+. Thank you Amal sir!"</p>
+                    <p class="text-sm font-bold">Meera Nair • 10th State</p>
+                </div>
+                <div class="w-[350px] glass-panel p-8 rounded-3xl shrink-0">
+                    <p class="text-slate-300 mb-6 italic">"Cyberforensic resources are hard to find. Edoo is the only platform that gets it right."</p>
+                    <p class="text-sm font-bold">Sanjay V. • KU</p>
+                </div>
+            </div>
+            <div class="marquee-content py-4" aria-hidden="true">
+                <div class="w-[350px] glass-panel p-8 rounded-3xl shrink-0">
+                    <p class="text-slate-300 mb-6 italic">"BCA notes from Edoo made my semester exams incredibly smooth. Simplified logic."</p>
+                    <p class="text-sm font-bold">Abhijith P. • BCA</p>
+                </div>
+                <div class="w-[350px] glass-panel p-8 rounded-3xl shrink-0">
+                    <p class="text-slate-300 mb-6 italic">"The S2LC revision series is the reason I got full A+. Thank you Amal sir!"</p>
+                    <p class="text-sm font-bold">Meera Nair • 10th State</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Founder Section -->
+    <section id="about" class="py-32 px-6">
+        <div class="max-w-6xl mx-auto glass-panel p-10 md:p-20 rounded-[3rem] relative overflow-hidden reveal">
+            <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full"></div>
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="w-20 h-1 bg-blue-600 mb-8"></div>
+                    <h2 class="text-4xl md:text-6xl font-bold mb-8">Founder's Note</h2>
+                    <p class="text-xl text-slate-400 leading-relaxed mb-8 italic">
+                        "Education in Kerala needs a digital-first approach that respects the intensity of university syllabi while being accessible. Edoo is my commitment to that future."
+                    </p>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-bold text-white">Amal K P</span>
+                        <span class="text-blue-500 font-bold uppercase tracking-widest text-sm">Founder & Lead Educator</span>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="relative w-full max-w-xs aspect-square glass-panel rounded-[3rem] p-4 flex items-center justify-center">
+                        <div class="w-full h-full bg-slate-800 rounded-[2.5rem] flex items-center justify-center text-7xl font-black text-slate-700">AKP</div>
+                        <div class="absolute -top-4 -right-4 bg-blue-600 text-white p-6 rounded-3xl shadow-xl">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
+            <div class="max-w-xs">
+                <div class="text-3xl font-black mb-6">edoo</div>
+                <p class="text-slate-500 text-sm">Providing world-class learning resources for the students of Kerala.</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-12">
+                <div>
+                    <h4 class="text-white font-bold mb-4">Degrees</h4>
+                    <ul class="text-slate-500 space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-400">KTU Tracks</a></li>
+                        <li><a href="#" class="hover:text-blue-400">KU Tracks</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Connect</h4>
+                    <ul class="text-slate-500 space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-400">Instagram</a></li>
+                        <li><a href="#" class="hover:text-blue-400">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX - 10,
+                y: e.clientY - 10,
+                duration: 0.1
+            });
+        });
+
+        // Mobile Menu
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenu = document.getElementById('closeMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        menuBtn.onclick = () => mobileMenu.classList.add('active');
+        closeMenu.onclick = () => mobileMenu.classList.remove('active');
+
+        window.onload = () => {
+            // Initial Hero Animation
+            const tl = gsap.timeline({defaults: {ease: "power4.out"}});
+            tl.to("#heroBadge", { opacity: 1, y: -10, duration: 0.8 })
+              .to("#heroTitle", { opacity: 1, y: -20, duration: 1 }, "-=0.4")
+              .to("#heroDesc", { opacity: 1, y: -20, duration: 1 }, "-=0.6")
+              .to("#heroActions", { opacity: 1, y: -20, duration: 1 }, "-=0.8");
+
+            // General Reveal Animation
+            gsap.utils.toArray(".reveal").forEach(el => {
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    },
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "expo.out"
+                });
+            });
+
+            // 3D Tilt Logic for Track Cards
+            document.querySelectorAll('.track-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+
+                    gsap.to(card, {
+                        rotateX: rotateX,
+                        rotateY: rotateY,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.5 });
+                });
+            });
+
+            // Continuous Marquee
+            gsap.to(".marquee-content", {
+                xPercent: -100,
+                repeat: -1,
+                duration: 30,
+                ease: "none"
+            });
+        };
+
+        // Cursor Scaling
+        document.querySelectorAll('button, a, .glass-panel, .track-card').forEach(el => {
+            el.onmouseenter = () => gsap.to(cursor, { scale: 3, opacity: 0.4 });
+            el.onmouseleave = () => gsap.to(cursor, { scale: 1, opacity: 1 });
+        });
+    </script>
+</body>
+</html>
+
